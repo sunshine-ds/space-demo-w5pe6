@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A tiny responsive single-file Tailwind page that says 'Hello Space'." />
+    <title>Hello Space — Tiny Tailwind Demo</title>
+
+    <!-- Tailwind CDN with config (dark mode via class) -->
+    <script>
+      // Tailwind config must be available before loading the CDN script
+      window.tailwind = {
+        config: {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                space: {
+                  50: '#f7fbff',
+                  100: '#eef6ff',
+                  200: '#d7ecff',
+                  300: '#bfe2ff',
+                  400: '#66c0ff',
+                  500: '#00a0ff',
+                  600: '#0087e6',
+                  700: '#0061b3',
+                  800: '#004680',n
+                  900: '#00264d'
+                }
+              },
+              fontFamily: {
+                sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial']
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      /* Small, focused styles for the star field canvas and accessibility */
+      html, body { height: 100%; }
+      body { margin: 0; }
+      #starfield {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        display: block;
+      }
+      /* Decorative planet for small screens to keep visuals pleasant */
+      .planet {
+        filter: drop-shadow(0 8px 24px rgba(2,6,23,0.45));
+      }
+      /* Motion prefers-reduced-motion fallback */
+      @media (prefers-reduced-motion: reduce) {
+        .twinkle { animation: none !important; }
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-sky-50 dark:from-slate-900 dark:via-slate-950 dark:to-black text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center">
+
+    <!-- Starfield canvas behind content -->
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <!-- Main content (centered) -->
+    <main class="relative z-10 w-full max-w-4xl px-6 py-12 lg:py-24">
+      <div class="mx-auto text-center">
+        <div class="inline-block p-6 rounded-3xl bg-white/60 dark:bg-black/40 backdrop-blur-md border border-white/40 dark:border-white/5 shadow-xl">
+          <div class="flex items-center justify-center gap-4">
+            <!-- Tiny decorative planet (SVG) -->
+            <svg class="planet w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0" stop-color="#7dd3fc" />
+                  <stop offset="1" stop-color="#60a5fa" />
+                </linearGradient>
+                <radialGradient id="g2" cx="30%" cy="25%">
+                  <stop offset="0" stop-color="#fff" stop-opacity="0.6" />
+                  <stop offset="1" stop-color="#000" stop-opacity="0.0" />
+                </radialGradient>
+              </defs>
+              <circle cx="60" cy="60" r="44" fill="url(#g1)" />
+              <ellipse cx="62" cy="68" rx="25" ry="8" fill="rgba(255,255,255,0.07)" />
+              <circle cx="85" cy="38" r="6" fill="#0ea5e9" opacity="0.25" />
+              <circle cx="35" cy="45" r="3" fill="#fff" opacity="0.7" />
+            </svg>
+
+            <div class="text-left">
+              <h1 id="greeting" class="text-4xl sm:text-6xl md:text-7xl leading-tight font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 dark:from-sky-400 dark:to-indigo-300">Hello Space</h1>
+              <p class="mt-2 text-sm sm:text-base text-slate-700 dark:text-slate-300">A tiny single-file, fully responsive Tailwind page — crisp, accessible, and beautiful.</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button id="toggleDark" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-slate-900 text-white hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500" aria-pressed="false">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden>
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+              </svg>
+              <span id="toggleDarkLabel">Enable Dark</span>
+            </button>
+
+            <button id="copyBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-sky-50 text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500" aria-live="polite">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden>
+                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copyLabel">Copy "Hello Space"</span>
+            </button>
+
+            <button id="randomize" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-white/60 dark:bg-white/6 text-slate-800 dark:text-slate-200 border border-white/30 dark:border-white/6 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden>
+                <path d="M12 3v3M5 6v1a2 2 0 0 0 2 2h1" />
+                <path d="M21 21l-6-6" />
+              </svg>
+              <span>Random Greeting</span>
+            </button>
+          </div>
+
+        </div>
+
+        <p class="mt-6 text-xs text-slate-500 dark:text-slate-400">Built with Tailwind CSS • Single-file • Responsive • Accessible</p>
+      </div>
+    </main>
+
+    <!-- Inline JavaScript: starfield, interactions, accessibility helpers -->
+    <script>
+      // --- Starfield Canvas ---
+      (function () {
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let width = 0;
+        let height = 0;
+        const STAR_COUNT = Math.min(220, Math.floor(Math.max(window.innerWidth, window.innerHeight) / 4));
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        function init() {
+          resize();
+          stars = [];
+          for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push({
+              x: Math.random() * width,
+              y: Math.random() * height,
+              r: Math.random() * 1.4 + 0.3,
+              alpha: Math.random() * 0.9 + 0.1,
+              twinkle: Math.random() * Math.PI * 2,
+              speed: (Math.random() * 0.03) + 0.005
+n            });
+          }
+          animate();
+        }
+
+        function resize() {
+          const dpr = window.devicePixelRatio || 1;
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        let last = 0;
+        function animate(ts) {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          const delta = ts - last; last = ts;
+          ctx.clearRect(0, 0, width, height);
+
+          // subtle radial gradient background (space feel)
+          const g = ctx.createLinearGradient(0, 0, width, height);
+          g.addColorStop(0, 'rgba(14,165,233,0.02)');
+          g.addColorStop(1, 'rgba(99,102,241,0.03)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, width, height);
+
+          for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            // twinkle
+            s.twinkle += s.speed * delta * 0.06;
+            const a = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          requestAnimationFrame(animate);
+        }
+
+        // parallax on mouse move
+        let px = 0.5, py = 0.5;
+        window.addEventListener('mousemove', (e) => {
+          px = e.clientX / width;
+          py = e.clientY / height;
+          // shift stars slightly
+          for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            const shift = (i % 5) * 0.4;
+            s.x += (px - 0.5) * shift;
+            s.y += (py - 0.5) * shift;
+            // clamp
+            if (s.x < 0) s.x = width + s.x;
+            if (s.x > width) s.x = s.x - width;
+            if (s.y < 0) s.y = height + s.y;
+            if (s.y > height) s.y = s.y - height;
+          }
+        });
+
+        window.addEventListener('resize', () => {
+          resize();
+          // reposition stars proportionally
+          for (let i = 0; i < stars.length; i++) {
+            stars[i].x = Math.random() * width;
+            stars[i].y = Math.random() * height;
+          }
+        });
+
+        // init after a tiny delay to avoid layout thrash
+        setTimeout(init, 50);
+      })();
+
+      // --- Interactions: dark mode toggle, copy greeting, randomize greeting ---
+      (function () {
+        const root = document.documentElement;
+        const toggle = document.getElementById('toggleDark');
+        const toggleLabel = document.getElementById('toggleDarkLabel');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyLabel = document.getElementById('copyLabel');
+        const greetingEl = document.getElementById('greeting');
+        const randomBtn = document.getElementById('randomize');
+
+        // Respect saved preference
+        const saved = localStorage.getItem('hello-space-dark');
+        if (saved === 'true' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          root.classList.add('dark');
+          toggle.setAttribute('aria-pressed', 'true');
+          toggleLabel.textContent = 'Disable Dark';
+        }
+
+        toggle.addEventListener('click', () => {
+          const active = root.classList.toggle('dark');
+          toggle.setAttribute('aria-pressed', String(active));
+          toggleLabel.textContent = active ? 'Disable Dark' : 'Enable Dark';
+          localStorage.setItem('hello-space-dark', active ? 'true' : 'false');
+        });
+
+        copyBtn.addEventListener('click', async () => {
+          const text = greetingEl.textContent.trim();
+          try {
+            await navigator.clipboard.writeText(text);
+            copyLabel.textContent = 'Copied!';
+            setTimeout(() => copyLabel.textContent = 'Copy "Hello Space"', 1500);
+          } catch (e) {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); copyLabel.textContent = 'Copied!'; }
+            catch (err) { copyLabel.textContent = 'Copy failed'; }
+            ta.remove();
+            setTimeout(() => copyLabel.textContent = 'Copy "Hello Space"', 1500);
+          }
+        });
+
+        const greetings = ['Hello Space', '¡Hola, Espacio!', 'Bonjour Espace', 'こんにちは 宇宙', 'Hallo Raum', 'Ciao Spazio', 'Olá Espaço', 'Привет, космос', '你好，太空', 'Hello, Universe'];
+        randomBtn.addEventListener('click', () => {
+          const current = greetingEl.textContent.trim();
+          let pick;
+          // ensure different from current
+          do { pick = greetings[Math.floor(Math.random() * greetings.length)]; } while (pick === current && greetings.length > 1);
+          greetingEl.textContent = pick;
+          // subtle accessible announcement
+          randomBtn.setAttribute('aria-live', 'polite');
+        });
+
+        // keyboard: press 'd' to toggle dark, 'c' to copy
+        window.addEventListener('keydown', (e) => {
+          if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+          if (e.key.toLowerCase() === 'd') toggle.click();
+          if (e.key.toLowerCase() === 'c') copyBtn.click();
+        });
+      })();
+
+      // Small enhancement: announce page title for screen readers when loaded
+      (function () {
+        const sr = document.createElement('div');
+        sr.setAttribute('aria-live', 'polite');
+        sr.className = 'sr-only';
+        sr.style.position = 'absolute';
+        sr.style.left = '-9999px';
+        sr.textContent = 'Hello Space — page loaded';
+        document.body.appendChild(sr);
+        setTimeout(() => sr.remove(), 2000);
+      })();
+    </script>
+  </body>
+</html>
